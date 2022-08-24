@@ -1,4 +1,4 @@
-import { AppendDataToSheetOpts, ReadDataFromSheetOpts, Sheet } from '@lib/models';
+import { AppendDataToSheetOpts, Range, ReadDataFromSheetOpts, Sheet } from '@lib/models';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
 
@@ -44,13 +44,7 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, { mapFn, headers =
     /** Range of empty columns in which no data was written, to the right of the new rows. */
     const newEmptyColsRange = sheet.getRange(prevNRows + 1, nColsNewRows + 1, newRowsData.length, nColsNotWritten);
 
-    sheet
-      .getRange(prevNRows, nColsNewRows + 1, 1, nColsNotWritten)
-      .copyTo(newEmptyColsRange, SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false);
-
-    const formulas = newEmptyColsRange.getFormulas();
-
-    newEmptyColsRange.clearContent().setFormulas(formulas);
+    copyFormulas(sheet.getRange(prevNRows, nColsNewRows + 1, 1, nColsNotWritten), newEmptyColsRange);
   }
 };
 
@@ -73,3 +67,31 @@ export const readDataFromSheet = <T>(sheet: Sheet, { mapFn, headers = sheet.getF
 /** Clear content from a whole sheet except for the header rows. */
 export const clearSheet = (sh: Sheet, headers = sh.getFrozenRows()) =>
   sh.getRange(1 + headers, 1, sh.getMaxRows(), sh.getMaxColumns()).clearContent();
+
+/** Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them. */
+export const addColsToSheet = <T>(sheet: Sheet, headerValues: T[]): number => {
+  const pos = sheet.getLastColumn();
+  const nRows = sheet.getMaxRows();
+
+  // insert new columns and set it to the header value
+  sheet
+    .insertColumnsAfter(pos, headerValues.length)
+    .getRange(1, pos + 1, 1, headerValues.length)
+    .setValues(headerValues.map(column => [column]));
+
+  // restore formulas in the new columns
+  copyFormulas(sheet.getRange(2, pos, nRows - 1, 1), sheet.getRange(2, pos + 1, nRows - 1, headerValues.length));
+
+  return pos + headerValues.length;
+};
+
+/** Copy formulas from `reference` to `target`. */
+export const copyFormulas = (reference: Range, target: Range): void => {
+  const targetValues = target.getValues();
+
+  reference.copyTo(target, SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false);
+
+  const formulas = target.getFormulas();
+
+  target.clearContent().setValues(targetValues).setFormulas(formulas);
+};
