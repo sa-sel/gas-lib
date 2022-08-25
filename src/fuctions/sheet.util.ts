@@ -1,4 +1,4 @@
-import { AppendDataToSheetOpts, Range, ReadDataFromSheetOpts, Sheet } from '@lib/models';
+import { Range, Sheet } from '@lib/models';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
 
@@ -16,43 +16,57 @@ export const removeEmptyRows = (sheet: Sheet) => {
   sheet.getRange(1, 1, sheetData.length, sheetData[0].length).setValues(sheetData);
 };
 
-export const appendDataToSheet = <T>(data: T[], sheet: Sheet, { mapFn, headers = sheet.getFrozenRows() }: AppendDataToSheetOpts<T>) => {
+/**
+ * @param data data to be appended
+ * @param sheet sheet to append `data` to
+ * @param mapFn function to map each `data` element to a row
+ */
+export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (member: T) => any[]): void => {
   if (!data.length) {
     return;
   }
 
-  const prevNRows = sheet.getLastRow();
+  const prevNRows = sheet.getMaxRows();
   const newRowsData = data.map(mapFn);
   const nColsNewRows = newRowsData[0].length;
-  const firstRow = sheet.getRange(1 + headers, 1, 1, newRowsData.length);
+  const prevLastRow = sheet.getRange(prevNRows, 1, 1, newRowsData.length);
 
-  // if the first row is empty, insert a member in it
-  if (!firstRow.getValues()[0].reduce((acc, cur) => acc || cur)) {
-    firstRow.setValues([newRowsData.pop()]);
+  // if the last or first row is empty, insert data in it
+  if (
+    !prevLastRow
+      .getValues()
+      .flat()
+      .reduce((acc, cur) => acc || cur)
+  ) {
+    prevLastRow.setValues([newRowsData.pop()]);
   }
 
-  // append remaining members to the sheet
-  sheet
-    .insertRowsAfter(prevNRows, newRowsData.length)
-    .getRange(prevNRows + 1, 1, newRowsData.length, nColsNewRows)
-    .setValues(newRowsData);
+  if (newRowsData.length) {
+    // append remaining data to the sheet
+    sheet
+      .insertRowsAfter(prevNRows, newRowsData.length)
+      .getRange(prevNRows + 1, 1, newRowsData.length, nColsNewRows)
+      .setValues(newRowsData);
 
-  const nColsNotWritten = sheet.getMaxColumns() - nColsNewRows;
+    const nColsNotWritten = sheet.getMaxColumns() - nColsNewRows;
 
-  // restore formulas on columns in which no data was written (if there is any)
-  if (nColsNotWritten) {
-    /** Range of empty columns in which no data was written, to the right of the new rows. */
-    const newEmptyColsRange = sheet.getRange(prevNRows + 1, nColsNewRows + 1, newRowsData.length, nColsNotWritten);
+    // restore formulas on columns in which no data was written (if there is any)
+    if (nColsNotWritten) {
+      /** Range of empty columns in which no data was written, to the right of the new rows. */
+      const newEmptyColsRange = sheet.getRange(prevNRows + 1, nColsNewRows + 1, newRowsData.length, nColsNotWritten);
 
-    copyFormulas(sheet.getRange(prevNRows, nColsNewRows + 1, 1, nColsNotWritten), newEmptyColsRange);
+      copyFormulas(sheet.getRange(prevNRows, nColsNewRows + 1, 1, nColsNotWritten), newEmptyColsRange);
+    }
   }
 };
 
 /**
- * Read all non-empty rows from `sheet` and convert them (via `mapFn`) to a list of objects (type `T`).
- * Header rows (`headers`) will be ignored.
+ * Read all non-empty rows from `sheet` and convert them to a list of objects.
+ * @param sheet sheet to append `data` to
+ * @param mapFn function to map each row element to a data object
+ * @param headers number of rows to be ignored when reading
  */
-export const readDataFromSheet = <T>(sheet: Sheet, { mapFn, headers = sheet.getFrozenRows() }: ReadDataFromSheetOpts<T>): T[] =>
+export const readDataFromSheet = <T>(sheet: Sheet, mapFn: (row: any[]) => T, headers = sheet.getFrozenRows()): T[] =>
   sheet
     .getRange(1 + headers, 1, sheet.getMaxRows(), sheet.getMaxColumns())
     .getValues()
@@ -68,21 +82,40 @@ export const readDataFromSheet = <T>(sheet: Sheet, { mapFn, headers = sheet.getF
 export const clearSheet = (sh: Sheet, headers = sh.getFrozenRows()) =>
   sh.getRange(1 + headers, 1, sh.getMaxRows(), sh.getMaxColumns()).clearContent();
 
-/** Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them. */
-export const addColsToSheet = <T>(sheet: Sheet, headerValues: T[]): number => {
-  const pos = sheet.getLastColumn();
+/**
+ * Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them.
+ * @param sheet the target sheet
+ * @param headerValues the values to be put in the column's first cell
+ */
+export const addColsToSheet = <T>(sheet: Sheet, headerValues: T[]): void => {
+  if (!headerValues.length) {
+    return;
+  }
+
+  const prevNCols = sheet.getMaxColumns();
   const nRows = sheet.getMaxRows();
+  const prevLastCol = sheet.getRange(1, prevNCols, nRows, 1);
 
-  // insert new columns and set it to the header value
-  sheet
-    .insertColumnsAfter(pos, headerValues.length)
-    .getRange(1, pos + 1, 1, headerValues.length)
-    .setValues(headerValues.map(column => [column]));
+  // if the last col is empty, insert data in it
+  if (
+    !prevLastCol
+      .getValues()
+      .flat()
+      .reduce((acc, cur) => acc || cur)
+  ) {
+    prevLastCol.getCell(1, 1).setValue(headerValues.pop());
+  }
 
-  // restore formulas in the new columns
-  copyFormulas(sheet.getRange(2, pos, nRows - 1, 1), sheet.getRange(2, pos + 1, nRows - 1, headerValues.length));
+  if (headerValues.length) {
+    // insert new columns and set it to the header value
+    sheet
+      .insertColumnsAfter(prevNCols, headerValues.length)
+      .getRange(1, prevNCols + 1, 1, headerValues.length)
+      .setValues(headerValues.map(column => [column]));
 
-  return pos + headerValues.length;
+    // restore formulas in the new columns
+    copyFormulas(sheet.getRange(2, prevNCols, nRows - 1, 1), sheet.getRange(2, prevNCols + 1, nRows - 1, headerValues.length));
+  }
 };
 
 /** Copy formulas from `reference` to `target`. */
