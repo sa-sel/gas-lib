@@ -1,4 +1,5 @@
-import { Range, Sheet } from '@lib/models';
+import { Sheet } from '@lib/models';
+import { copyFormulas } from './range.util';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
 
@@ -66,13 +67,13 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (member: T)
  * @param mapFn function to map each row element to a data object
  * @param headers number of rows to be ignored when reading
  */
-export const readDataFromSheet = <T>(sheet: Sheet, mapFn: (row: any[]) => T, headers = sheet.getFrozenRows()): T[] =>
+export const readDataFromSheet = <T>(sheet: Sheet, mapFn: (row: any[], index: number) => T, headers = sheet.getFrozenRows()): T[] =>
   sheet
     .getRange(1 + headers, 1, sheet.getMaxRows(), sheet.getMaxColumns())
     .getValues()
-    .reduce((acc, cur) => {
+    .reduce((acc, cur, i) => {
       if (cur.some(cell => cell)) {
-        acc.push(mapFn(cur));
+        acc.push(mapFn(cur, i));
       }
 
       return acc;
@@ -116,15 +117,4 @@ export const addColsToSheet = <T>(sheet: Sheet, headerValues: T[]): void => {
     // restore formulas in the new columns
     copyFormulas(sheet.getRange(2, prevNCols, nRows - 1, 1), sheet.getRange(2, prevNCols + 1, nRows - 1, headerValues.length));
   }
-};
-
-/** Copy formulas from `reference` to `target`. */
-export const copyFormulas = (reference: Range, target: Range): void => {
-  const targetValues = target.getValues();
-
-  reference.copyTo(target, SpreadsheetApp.CopyPasteType.PASTE_FORMULA, false);
-
-  const formulas = target.getFormulas();
-
-  target.clearContent().setValues(targetValues).setFormulas(formulas);
 };
