@@ -15,7 +15,7 @@ export const saveNewData = <T>({
 }: SaveNewDataParams<T>) => {
   const validNewData: T[] = [];
   const invalidNewData: T[] = [];
-  const allNewData: T[] = readDataFromSheet(newDataSheet, parseRowToData);
+  const allNewData: T[] = readDataFromSheet(newDataSheet, { map: parseRowToData });
   const newDataSheetName = newDataSheet.getName();
 
   if (!allNewData.length) {

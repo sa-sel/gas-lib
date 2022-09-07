@@ -1,9 +1,10 @@
-import { Sheet } from '@lib/models';
+import { ReadDataFromSheetFunctions, Sheet } from '@lib/models';
+import { safeCall } from './function.util';
 import { copyFormulas, setValues } from './range.util';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
 
-export const isSheetOneOf = (sheet: Sheet, options: Sheet[]): boolean => options.map(opt => opt.getSheetId()).includes(sheet.getSheetId());
+export const isSheetOneOf = (sheet: Sheet, options: Sheet[]): boolean => options.some(opt => isSameSheet(opt, sheet));
 
 /** Remove all empty rows in `sheet`, leaving at least one row (empty or not) left. */
 export const removeEmptyRows = (sheet: Sheet) => {
@@ -58,16 +59,18 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
 /**
  * Read all non-empty rows from `sheet` and convert them to a list of objects.
  * @param sheet sheet to append `data` to
- * @param mapFn function to map each row element to a data object
+ * @param functions functions to manage the rows and data
  * @param headers number of rows to be ignored when reading
  */
-export const readDataFromSheet = <T>(sheet: Sheet, mapFn: (row: any[], index: number) => T, headers = sheet.getFrozenRows()): T[] =>
+export const readDataFromSheet = <T>(sheet: Sheet, functions: ReadDataFromSheetFunctions<T>, headers = sheet.getFrozenRows()): T[] =>
   sheet
     .getRange(1 + headers, 1, sheet.getMaxRows(), sheet.getMaxColumns())
     .getValues()
-    .reduce((acc, cur, i) => {
-      if (cur.some(cell => cell)) {
-        acc.push(mapFn(cur, i));
+    .reduce((acc, cur) => {
+      const obj = functions.map(cur);
+
+      if (safeCall(functions.filter, obj, cur) ?? cur.some(cell => cell)) {
+        acc.push(obj);
       }
 
       return acc;
