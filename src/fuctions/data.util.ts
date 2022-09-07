@@ -61,3 +61,6 @@ export const saveNewData = <T>({
     ss.toast('Os dados foram salvos.', DialogTitle.Success);
   }
 };
+
+/** Generate a random and (hopefully unique) 16-digit number. */
+export const generateId = () => Math.round(new Date().valueOf() + Math.random() * 10e16);
