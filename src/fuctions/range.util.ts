@@ -28,6 +28,10 @@ export const getRangeBelow = (header: Range | string): Range | null => {
 };
 
 export const rangesOverlap = (range1: Range, range2: Range): boolean => {
+  if (range1.getSheet().getSheetId() !== range2.getSheet().getSheetId()) {
+    return false;
+  }
+
   const maxRow = Math.max(range1.getLastRow(), range2.getLastRow());
   const minRow = Math.min(range1.getRow(), range2.getRow());
   const maxCol = Math.max(range1.getLastColumn(), range2.getLastColumn());
@@ -37,4 +41,37 @@ export const rangesOverlap = (range1: Range, range2: Range): boolean => {
   const colsOverlap = range1.getNumColumns() + range2.getNumColumns() > maxCol - minCol;
 
   return rowsOverlap && colsOverlap;
+};
+
+/**
+ * Set `values` to a `range`.
+ * @param range target range
+ * @param values matrix of values to be set. Any `undefined` value here will be substituted for that cell's previous formula or value.
+ */
+export const setValues = (range: Range, values: any[][]): void => {
+  const nRows = range.getNumRows();
+  const nCols = range.getNumColumns();
+
+  if (!nRows || !nCols || values.length !== nRows) {
+    throw new Error('The `range` and `values` shapes do not match.');
+  }
+
+  const prevFormulas = range.getFormulas();
+  const prevValues = range.getValues();
+
+  // substitute `undefined` values in `values`
+  // for the cell's previous formula or value
+  for (let i = 0; i < nRows; i++) {
+    if (values[i].length !== nCols) {
+      throw new Error('The `range` and `values` shapes do not match.');
+    }
+
+    for (let j = 0; j < nCols; j++) {
+      if (values[i][j] === undefined) {
+        values[i][j] = prevFormulas[i][j] || prevValues[i][j];
+      }
+    }
+  }
+
+  range.setValues(values);
 };

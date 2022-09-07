@@ -1,7 +1,9 @@
 import { Sheet } from '@lib/models';
-import { copyFormulas } from './range.util';
+import { copyFormulas, setValues } from './range.util';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
+
+export const isSheetOneOf = (sheet: Sheet, options: Sheet[]): boolean => options.map(opt => opt.getSheetId()).includes(sheet.getSheetId());
 
 /** Remove all empty rows in `sheet`, leaving at least one row (empty or not) left. */
 export const removeEmptyRows = (sheet: Sheet) => {
@@ -34,30 +36,22 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
 
   // if the last or first row is empty, insert data in it
   if (
-    !prevLastRow
+    prevLastRow
       .getValues()
       .flat()
-      .reduce((acc, cur) => acc || cur)
+      .every(v => !v)
   ) {
-    prevLastRow.setValues([newRowsData.pop()]);
+    setValues(prevLastRow, [newRowsData.pop()]);
   }
 
   if (newRowsData.length) {
-    // append remaining data to the sheet
-    sheet
-      .insertRowsAfter(prevNRows, newRowsData.length)
-      .getRange(prevNRows + 1, 1, newRowsData.length, nColsNewRows)
-      .setValues(newRowsData);
+    const newRange = sheet.insertRowsAfter(prevNRows, newRowsData.length).getRange(prevNRows + 1, 1, newRowsData.length, nColsNewRows);
 
-    const nColsNotWritten = sheet.getMaxColumns() - nColsNewRows;
+    // restore formulas on the new range
+    copyFormulas(sheet.getRange(prevNRows, 1, 1, sheet.getMaxColumns()), newRange);
 
-    // restore formulas on columns in which no data was written (if there is any)
-    if (nColsNotWritten) {
-      /** Range of empty columns in which no data was written, to the right of the new rows. */
-      const newEmptyColsRange = sheet.getRange(prevNRows + 1, nColsNewRows + 1, newRowsData.length, nColsNotWritten);
-
-      copyFormulas(sheet.getRange(prevNRows, nColsNewRows + 1, 1, nColsNotWritten), newEmptyColsRange);
-    }
+    // write data to the new range
+    setValues(newRange, newRowsData);
   }
 };
 
