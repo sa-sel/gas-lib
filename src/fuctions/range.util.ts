@@ -37,8 +37,8 @@ export const rangesOverlap = (range1: Range, range2: Range): boolean => {
   const maxCol = Math.max(range1.getLastColumn(), range2.getLastColumn());
   const minCol = Math.min(range1.getColumn(), range2.getColumn());
 
-  const rowsOverlap = range1.getNumRows() + range2.getNumRows() > maxRow - minRow;
-  const colsOverlap = range1.getNumColumns() + range2.getNumColumns() > maxCol - minCol;
+  const rowsOverlap = range1.getNumRows() + range2.getNumRows() > maxRow - minRow + 1;
+  const colsOverlap = range1.getNumColumns() + range2.getNumColumns() > maxCol - minCol + 1;
 
   return rowsOverlap && colsOverlap;
 };
