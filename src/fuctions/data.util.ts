@@ -1,7 +1,7 @@
 import { DialogTitle, ss } from '@lib/constants';
-import { SaveNewDataParams } from '@lib/models';
+import { Range, SaveNewDataParams, Sheet } from '@lib/models';
 import { safeCall } from './function.util';
-import { appendDataToSheet, clearSheet, readDataFromSheet } from './sheet.util';
+import { appendDataToSheet, clearSheet, isSheetOneOf, readDataFromSheet } from './sheet.util';
 
 /** Save the data in the "new data" sheet to all target sheets. */
 export const saveNewData = <T>({
@@ -64,3 +64,16 @@ export const saveNewData = <T>({
 
 /** Generate a random and (hopefully unique) 16-digit number. */
 export const generateId = () => Math.round(new Date().valueOf() + Math.random() * 10e16);
+
+/** Run a function to manage the data in each of the target sheets. */
+export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void => {
+  ss.createTextFinder(id)
+    .findAll()
+    .forEach(cell => {
+      const occurrenceSheet = cell.getSheet();
+
+      if (isSheetOneOf(occurrenceSheet, targetSheets)) {
+        fn(cell);
+      }
+    });
+};
