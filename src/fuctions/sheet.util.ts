@@ -7,7 +7,7 @@ export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b
 export const isSheetOneOf = (sheet: Sheet, options: Sheet[]): boolean => options.some(opt => isSameSheet(opt, sheet));
 
 /** Remove all empty rows in `sheet`, leaving at least one row (empty or not) left. */
-export const removeEmptyRows = (sheet: Sheet) => {
+export const removeEmptyRows = (sheet: Sheet, headers = sheet.getFrozenRows()) => {
   /** All non-empty data rows in the sheet. */
   const sheetData = sheet
     .getDataRange()
@@ -16,8 +16,8 @@ export const removeEmptyRows = (sheet: Sheet) => {
 
   // delete a number of rows equal to the number of empty
   // rows and restore the sheet data on the remaining ones
-  sheet.deleteRows(sheetData.length + 1, sheet.getMaxRows() - sheetData.length);
-  sheet.getRange(1, 1, sheetData.length, sheetData[0].length).setValues(sheetData);
+  sheet.deleteRows(headers + (sheetData.length || 1), sheet.getMaxRows() - sheetData.length);
+  sheet.getRange(headers + 1, 1, sheetData.length, sheetData[0].length).setValues(sheetData);
 };
 
 /**
@@ -63,20 +63,22 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
  * @param headers number of rows to be ignored when reading
  */
 export const readDataFromSheet = <T>(sheet: Sheet, functions?: ReadDataFromSheetFunctions<T>, headers = sheet.getFrozenRows()): T[] =>
-  sheet
-    .getRange(1 + headers, 1, sheet.getLastRow() - headers + 1, sheet.getMaxColumns())
-    .getValues()
-    .reduce((acc, cur) => {
-      if (safeCall(functions?.filter, cur) ?? cur.some(cell => cell)) {
-        acc.push(safeCall(functions?.map, cur) ?? cur);
-      }
+  sheet.getLastRow() <= headers
+    ? []
+    : sheet
+        .getRange(1 + headers, 1, sheet.getLastRow() - headers, sheet.getMaxColumns())
+        .getValues()
+        .reduce((acc, cur) => {
+          if (safeCall(functions?.filter, cur) ?? cur.some(cell => cell)) {
+            acc.push(safeCall(functions?.map, cur) ?? cur);
+          }
 
-      return acc;
-    }, []);
+          return acc;
+        }, []);
 
 /** Clear content from a whole sheet except for the header rows. */
-export const clearSheet = (sh: Sheet, headers = sh.getFrozenRows()) =>
-  sh.getRange(1 + headers, 1, sh.getMaxRows(), sh.getMaxColumns()).clearContent();
+export const clearSheet = (sheet: Sheet, headers = sheet.getFrozenRows()) =>
+  sheet.getRange(1 + headers, 1, sheet.getMaxRows(), sheet.getMaxColumns()).clearContent();
 
 /**
  * Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them.

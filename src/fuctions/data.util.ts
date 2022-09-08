@@ -1,7 +1,7 @@
 import { DialogTitle, GS } from '@lib/constants';
 import { Range, SaveNewDataParams, Sheet } from '@lib/models';
 import { safeCall } from './function.util';
-import { appendDataToSheet, clearSheet, isSheetOneOf, readDataFromSheet } from './sheet.util';
+import { appendDataToSheet, clearSheet, readDataFromSheet } from './sheet.util';
 
 /** Save the data in the "new data" sheet to all target sheets. */
 export const saveNewData = <T>({
@@ -67,15 +67,11 @@ export const saveNewData = <T>({
 export const generateId = () => Math.round(new Date().valueOf() + Math.random() * 10e16);
 
 /** Run a function to manage the data in each of the target sheets. */
-export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void => {
-  GS.ss
-    .createTextFinder(id)
-    .findAll()
-    .forEach(cell => {
-      const occurrenceSheet = cell.getSheet();
+export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void =>
+  targetSheets.forEach(sheet => {
+    let occurrence: Range;
 
-      if (isSheetOneOf(occurrenceSheet, targetSheets)) {
-        fn(cell);
-      }
-    });
-};
+    while ((occurrence = sheet.createTextFinder(id).findNext())) {
+      fn(occurrence);
+    }
+  });
