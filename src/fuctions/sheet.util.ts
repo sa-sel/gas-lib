@@ -62,15 +62,13 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
  * @param functions functions to manage the rows and data
  * @param headers number of rows to be ignored when reading
  */
-export const readDataFromSheet = <T>(sheet: Sheet, functions: ReadDataFromSheetFunctions<T>, headers = sheet.getFrozenRows()): T[] =>
+export const readDataFromSheet = <T>(sheet: Sheet, functions?: ReadDataFromSheetFunctions<T>, headers = sheet.getFrozenRows()): T[] =>
   sheet
-    .getRange(1 + headers, 1, sheet.getMaxRows(), sheet.getMaxColumns())
+    .getRange(1 + headers, 1, sheet.getLastRow() - headers + 1, sheet.getMaxColumns())
     .getValues()
     .reduce((acc, cur) => {
-      const obj = functions.map(cur);
-
-      if (safeCall(functions.filter, obj, cur) ?? cur.some(cell => cell)) {
-        acc.push(obj);
+      if (safeCall(functions?.filter, cur) ?? cur.some(cell => cell)) {
+        acc.push(safeCall(functions?.map, cur) ?? cur);
       }
 
       return acc;
