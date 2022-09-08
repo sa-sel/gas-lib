@@ -1,4 +1,4 @@
-import { ss } from '@lib/constants';
+import { GS } from '@lib/constants';
 import { Range } from '@lib/models';
 
 /** Copy formulas from `reference` to `target`. */
@@ -15,7 +15,7 @@ export const copyFormulas = (reference: Range, target: Range): void => {
 /** Select the whole range directly below the received `header`. */
 export const getRangeBelow = (header: Range | string): Range | null => {
   if (typeof header === 'string') {
-    header = ss.getRangeByName(header);
+    header = GS.ss.getRangeByName(header);
   }
 
   const sheet = header.getSheet();

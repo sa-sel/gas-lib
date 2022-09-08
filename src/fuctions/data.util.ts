@@ -1,4 +1,4 @@
-import { DialogTitle, ss } from '@lib/constants';
+import { DialogTitle, GS } from '@lib/constants';
 import { Range, SaveNewDataParams, Sheet } from '@lib/models';
 import { safeCall } from './function.util';
 import { appendDataToSheet, clearSheet, isSheetOneOf, readDataFromSheet } from './sheet.util';
@@ -19,7 +19,8 @@ export const saveNewData = <T>({
   const newDataSheetName = newDataSheet.getName();
 
   if (!allNewData.length) {
-    ss.toast(`Nenhum dado foi encontrado na planilha "${newDataSheetName}".`, DialogTitle.Error);
+    newDataSheet.activate();
+    GS.ss.toast(`Nenhum dado foi encontrado na planilha "${newDataSheetName}".`, DialogTitle.Error);
 
     return;
   }
@@ -33,14 +34,14 @@ export const saveNewData = <T>({
 
   // append all valid data to the synced sheets
   if (validNewData.length) {
-    ss.toast(`Os membros da planilha "${newDataSheetName}" estão sendo salvos.`, DialogTitle.InProgress);
+    GS.ss.toast(`Os membros da planilha "${newDataSheetName}" estão sendo salvos.`, DialogTitle.InProgress);
 
     targetSheets.forEach(sheet => {
       appendDataToSheet(validNewData, sheet, obj => parseDataToRow(obj, sheet));
       safeCall(hooks?.afterAppend, sheet);
     });
 
-    ss.toast(`Limpando os dados da planilha "${newDataSheetName}".`, DialogTitle.AlmostDone);
+    GS.ss.toast(`Limpando os dados da planilha "${newDataSheetName}".`, DialogTitle.AlmostDone);
     clearSheet(newDataSheet);
   }
 
@@ -52,13 +53,13 @@ export const saveNewData = <T>({
         .setValues(invalidNewData.map(obj => parseDataToRow(obj, newDataSheet)))
         .activate();
     }
-    ss.toast(
+    GS.ss.toast(
       invalidDataErrorMessage ?? `Há linhas com dados inválidos/ausentes na planilha "${newDataSheetName}".`,
       `${DialogTitle.Error} Dados inválidos.`,
     );
   } else {
     safeCall(hooks?.success);
-    ss.toast('Os dados foram salvos.', DialogTitle.Success);
+    GS.ss.toast('Os dados foram salvos.', DialogTitle.Success);
   }
 };
 
@@ -67,7 +68,8 @@ export const generateId = () => Math.round(new Date().valueOf() + Math.random() 
 
 /** Run a function to manage the data in each of the target sheets. */
 export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void => {
-  ss.createTextFinder(id)
+  GS.ss
+    .createTextFinder(id)
     .findAll()
     .forEach(cell => {
       const occurrenceSheet = cell.getSheet();

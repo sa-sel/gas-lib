@@ -5,3 +5,7 @@ export const enum DialogTitle {
   InProgress = 'Processando...',
   Success = 'Sucesso!',
 }
+
+export const enum DialogMessage {
+  UserCanceled = 'A operação foi cancelada pelo usuário.',
+}

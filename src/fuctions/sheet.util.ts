@@ -25,7 +25,7 @@ export const removeEmptyRows = (sheet: Sheet) => {
  * @param sheet sheet to append `data` to
  * @param mapFn function to map each `data` element to a row
  */
-export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[]): void => {
+export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[] = obj => obj as any[]): void => {
   if (!data.length) {
     return;
   }
