@@ -1,1 +1,1 @@
-export const parseDataToString = (data: any) => `${data}`.trim();
+export const toString = (data: any) => `${data}`.trim();

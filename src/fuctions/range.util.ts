@@ -27,6 +27,7 @@ export const getRangeBelow = (header: Range | string): Range | null => {
   return firstRow >= nRows ? null : sheet.getRange(firstRow, firstCol, nRows - (firstRow - 1), nCols);
 };
 
+/** Check if two ranges overlap. */
 export const rangesOverlap = (range1: Range, range2: Range): boolean => {
   if (range1.getSheet().getSheetId() !== range2.getSheet().getSheetId()) {
     return false;

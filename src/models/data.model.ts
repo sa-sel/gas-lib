@@ -16,7 +16,7 @@ export type SaveNewDataParams<T> = {
   /** Sheet that contains the new data. */
   newDataSheet: Sheet;
 
-  /** Function that converts a data object to a row array. */
+  /** Function that converts a data object to a row array (cells can be skipped with `undefined`). */
   parseDataToRow: (obj: T, sheet?: Sheet) => any[];
 
   /** Function that converts a row array to a data object. */

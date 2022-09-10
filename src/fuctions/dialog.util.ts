@@ -1,6 +1,7 @@
 import { DialogMessage, DialogTitle, GS } from '@lib/constants';
 import { DialogModel } from '@lib/models';
 
+/** Prompt use for YES/NO confirmatin and run a function if YES. */
 export const confirm = (dialog: DialogModel, fn: () => void) => {
   const ui = GS.ui();
   const response = ui.prompt(dialog.title, dialog.body, ui.ButtonSet.YES_NO);
@@ -17,6 +18,7 @@ export const confirm = (dialog: DialogModel, fn: () => void) => {
   }
 };
 
+/** Prompt user for text input. */
 export const input = (
   dialog: DialogModel,
   validate = (userInput: string) => !!userInput,

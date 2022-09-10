@@ -25,6 +25,7 @@ export const saveNewData = <T>({
     return;
   }
 
+  // if no custom validation was provided, accept all data rows
   const validate = safeCall(dataValidatorFactory, allNewData) ?? (() => true);
 
   // validate data
@@ -63,10 +64,7 @@ export const saveNewData = <T>({
   }
 };
 
-/** Generate a random and (hopefully unique) 16-digit number. */
-export const generateId = () => Math.round(new Date().valueOf() + Math.random() * 10e16);
-
-/** Run a function to manage the data in each of the target sheets. */
+/** Run a function to manage the data in each of the target sheets. It's paramter must be the data's "id" cell. */
 export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void =>
   targetSheets.forEach(sheet => {
     let occurrence: Range;

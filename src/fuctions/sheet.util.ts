@@ -23,7 +23,7 @@ export const removeEmptyRows = (sheet: Sheet, headers = sheet.getFrozenRows()) =
 /**
  * @param data data to be appended
  * @param sheet sheet to append `data` to
- * @param mapFn function to map each `data` element to a row
+ * @param mapFn function to map each `data` element to a row (cells can be skipped using `undefined`)
  */
 export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[] = obj => obj as any[]): void => {
   if (!data.length) {
@@ -35,7 +35,7 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
   const nColsNewRows = newRowsData[0].length;
   const prevLastRow = sheet.getRange(prevNRows, 1, 1, newRowsData.length);
 
-  // if the last or first row is empty, insert data in it
+  // if the last row is empty, insert data in it
   if (
     prevLastRow
       .getValues()
@@ -45,6 +45,7 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
     setValues(prevLastRow, [newRowsData.pop()]);
   }
 
+  // if there's any data remaining to be inserted
   if (newRowsData.length) {
     const newRange = sheet.insertRowsAfter(prevNRows, newRowsData.length).getRange(prevNRows + 1, 1, newRowsData.length, nColsNewRows);
 
