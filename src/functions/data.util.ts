@@ -64,7 +64,7 @@ export const saveNewData = <T>({
   }
 };
 
-/** Run a function to manage the data in each of the target sheets. It's paramter must be the data's "id" cell. */
+/** Run a function to manage the data in each of the target sheets. It's parameter must be the data's "id" cell. */
 export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void =>
   targetSheets.forEach(sheet => {
     let occurrence: Range;
