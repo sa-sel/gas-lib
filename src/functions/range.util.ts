@@ -97,3 +97,6 @@ export const safeDeleteRow = (range: Range, headers = range.getSheet().getFrozen
     sheet.deleteRow(rowPos);
   }
 };
+
+/** Fetch a named range's value. */
+export const getNamedValue = (name: string): string => GS.ss.getRangeByName(name).getValue();
