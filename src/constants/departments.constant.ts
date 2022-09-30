@@ -9,3 +9,8 @@ export const enum SaDepartment {
   Technology = 'Tecnologia',
   Treasury = 'Finanças',
 }
+
+export const SaDepartmentAbbreviations: Partial<Record<SaDepartment, string>> = {
+  [SaDepartment.Academic]: 'AA',
+  [SaDepartment.HR]: 'RH',
+} as const;
