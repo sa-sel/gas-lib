@@ -25,7 +25,7 @@ export const removeEmptyRows = (sheet: Sheet, headers = sheet.getFrozenRows()) =
  * @param sheet sheet to append `data` to
  * @param mapFn function to map each `data` element to a row (cells can be skipped using `undefined`)
  */
-export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[] = obj => obj as any[]): void => {
+export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[] = obj => obj as unknown as any[]): void => {
   if (!data.length) {
     return;
   }

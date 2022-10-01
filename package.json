@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky install",
     "format": "eslint . --fix --quiet; prettier --write .",
-    "lint": "eslint . && prettier --check"
+    "lint": "eslint . && prettier --check ."
   },
   "devDependencies": {
     "@google/clasp": "^2.4.1",

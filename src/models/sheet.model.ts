@@ -6,13 +6,13 @@ export type Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 export type ReadDataFromSheetFunctions<T> = {
   /**
    * Function to map each row element to a data object
-   * @default (row: any[]) => row
+   * @default row => row
    */
   map?: (row: any[]) => T;
 
   /**
    * Function to filter rows
-   * @default (row: any[]) => row.some(cell => cell)
+   * @default row => row.some(cell => cell)
    */
   filter?: (row: any[]) => boolean;
 };
