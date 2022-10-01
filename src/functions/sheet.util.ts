@@ -84,10 +84,10 @@ export const clearSheet = (sheet: Sheet, headers = sheet.getFrozenRows()) =>
 /**
  * Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them.
  * @param sheet the target sheet
- * @param headerValues the values to be put in the column's first cell
+ * @param values the values to be put in the columns
  */
-export const addColsToSheet = <T>(sheet: Sheet, headerValues: T[]): void => {
-  if (!headerValues.length) {
+export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
+  if (!values.length || !values[0].length) {
     return;
   }
 
@@ -100,19 +100,24 @@ export const addColsToSheet = <T>(sheet: Sheet, headerValues: T[]): void => {
     !prevLastCol
       .getValues()
       .flat()
-      .reduce((acc, cur) => acc || cur)
+      .every(v => !v)
   ) {
-    prevLastCol.getCell(1, 1).setValue(headerValues.pop());
+    const colValues = [];
+
+    for (const row of values) {
+      colValues.push([row.pop()]);
+    }
+
+    setValues(prevLastCol, colValues);
   }
 
-  if (headerValues.length) {
-    // insert new columns and set it to the header value
-    sheet
-      .insertColumnsAfter(prevNCols, headerValues.length)
-      .getRange(1, prevNCols + 1, 1, headerValues.length)
-      .setValues(headerValues.map(column => [column]));
+  if (values.length && values[0].length) {
+    const newRange = sheet.insertColumnsAfter(prevNCols, values[0].length).getRange(1, prevNCols + 1, values.length, values[0].length);
 
-    // restore formulas in the new columns
-    copyFormulas(sheet.getRange(2, prevNCols, nRows - 1, 1), sheet.getRange(2, prevNCols + 1, nRows - 1, headerValues.length));
+    // restore formulas on the new range
+    copyFormulas(sheet.getRange(1, prevNCols, nRows, 1), newRange);
+
+    // write data to the new range
+    setValues(newRange, values);
   }
 };
