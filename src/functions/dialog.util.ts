@@ -3,11 +3,10 @@ import { DialogModel } from '@lib/models';
 
 /** Prompt use for YES/NO confirmatin and run a function if YES. */
 export const confirm = (dialog: DialogModel, fn: () => void) => {
-  const ui = GS.ui();
-  const response = ui.prompt(dialog.title, dialog.body, ui.ButtonSet.YES_NO);
+  const response = GS.ssui.prompt(dialog.title, dialog.body, GS.ssui.ButtonSet.YES_NO);
 
   switch (response.getSelectedButton()) {
-    case ui.Button.YES: {
+    case GS.ssui.Button.YES: {
       fn();
       break;
     }
@@ -27,12 +26,11 @@ export const input = (
   let response: GoogleAppsScript.Base.PromptResponse;
   let inputValue: string;
   const body = () => dialog.body + (inputValue === undefined ? '' : `\n\n${validationErrorMsg(inputValue)}`);
-  const ui = GS.ui();
 
   do {
-    response = ui.prompt(dialog.title, body(), ui.ButtonSet.OK_CANCEL);
+    response = GS.ssui.prompt(dialog.title, body(), GS.ssui.ButtonSet.OK_CANCEL);
 
-    if (response.getSelectedButton() === ui.Button.CANCEL) {
+    if (response.getSelectedButton() === GS.ssui.Button.CANCEL) {
       GS.ss.toast(DialogMessage.UserCanceled, DialogTitle.Aborted);
 
       return null;

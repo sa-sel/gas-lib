@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-namespace*/
-
 /** The global spreadsheet namespace. */
-export namespace GS {
+export class GS {
   /** The whole spreadsheet. */
-  export const ss = SpreadsheetApp.getActiveSpreadsheet();
-  /** Factory for the Google Sheet's user interface. */
-  export const ui = () => SpreadsheetApp.getUi();
+  static ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  /** The Google Sheet's user interface. */
+  static get ssui(): GoogleAppsScript.Base.Ui {
+    return SpreadsheetApp.getUi();
+  }
 }
