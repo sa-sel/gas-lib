@@ -2,7 +2,7 @@
   "name": "@sa-sel/lib",
   "version": "1.0.0",
   "private": true,
-  "license": "",
+  "license": "MIT",
   "scripts": {
     "prepare": "husky install",
     "format": "eslint . --fix --quiet; prettier --write .",

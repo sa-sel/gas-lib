@@ -68,8 +68,9 @@ export const saveNewData = <T>({
 export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCell: Range) => any): void =>
   targetSheets.forEach(sheet => {
     let occurrence: Range;
+    const finder = sheet.createTextFinder(id);
 
-    while ((occurrence = sheet.createTextFinder(id).findNext())) {
+    while ((occurrence = finder.findNext())) {
       fn(occurrence);
     }
   });
