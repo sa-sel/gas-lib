@@ -1,7 +1,7 @@
 import { DialogTitle, GS } from '@lib/constants';
-import { Range, SaveNewDataParams, Sheet } from '@lib/models';
+import { FetchDataFunctions, Range, SaveNewDataParams, Sheet } from '@lib/models';
 import { safeCall } from './function.util';
-import { appendDataToSheet, clearSheet, readDataFromSheet } from './sheet.util';
+import { appendDataToSheet, clearSheet } from './sheet.util';
 
 /** Save the data in the "new data" sheet to all target sheets. */
 export const saveNewData = <T>({
@@ -15,7 +15,7 @@ export const saveNewData = <T>({
 }: SaveNewDataParams<T>) => {
   const validNewData: T[] = [];
   const invalidNewData: T[] = [];
-  const allNewData: T[] = readDataFromSheet(newDataSheet, { map: parseRowToData });
+  const allNewData: T[] = fetchData(newDataSheet, { map: parseRowToData });
   const newDataSheetName = newDataSheet.getName();
 
   if (!allNewData.length) {
@@ -74,3 +74,37 @@ export const manageDataInSheets = (id: string, targetSheets: Sheet[], fn: (idCel
       fn(occurrence);
     }
   });
+
+/**
+ * Read all non-empty rows from `sheet` and convert them to a list of objects.
+ * @param target sheet or range to append `data` to
+ * @param functions methods to manage the rows and data
+ * @param headers number of rows to be ignored when reading
+ */
+export const fetchData = <T>(
+  target: Sheet | Range,
+  functions?: FetchDataFunctions<T>,
+  headers = (target as Sheet).getFrozenRows ? (target as Sheet).getFrozenRows() : 0,
+): T[] => {
+  if (target.getLastRow() <= headers) {
+    return [];
+  }
+
+  let range: Range;
+
+  if ((target as Sheet).getSheetId) {
+    target = target as Sheet;
+    range = target.getRange(1 + headers, 1, target.getLastRow() - headers, target.getMaxColumns());
+  } else {
+    target = target as Range;
+    range = target.offset(headers, 0, target.getNumRows() - headers, target.getNumColumns());
+  }
+
+  return range.getValues().reduce((acc, cur) => {
+    if (safeCall(functions?.filter, cur) ?? cur.some(cell => cell)) {
+      acc.push(safeCall(functions?.map, cur) ?? cur);
+    }
+
+    return acc;
+  }, []);
+};
