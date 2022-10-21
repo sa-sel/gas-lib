@@ -1,4 +1,5 @@
-import { Sheet } from '@lib/models';
+import { Range, Sheet } from '@lib/models';
+import { transpose } from './array.util';
 import { copyFormulas, setValues } from './range.util';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
@@ -23,10 +24,11 @@ export const removeEmptyRows = (sheet: Sheet, headers = sheet.getFrozenRows()) =
  * @param data data to be appended
  * @param sheet sheet to append `data` to
  * @param mapFn function to map each `data` element to a row (cells can be skipped using `undefined`)
+ * @returns edited range
  */
-export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[] = obj => obj as unknown as any[]): void => {
+export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) => any[] = obj => obj as unknown as any[]): Range => {
   if (!data.length) {
-    return;
+    return null;
   }
 
   const prevNRows = sheet.getMaxRows();
@@ -53,6 +55,10 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
 
     // write data to the new range
     setValues(newRange, newRowsData);
+
+    return newRange;
+  } else {
+    return prevLastRow;
   }
 };
 
@@ -63,7 +69,7 @@ export const clearSheet = (sheet: Sheet, headers = sheet.getFrozenRows()) =>
 /**
  * Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them.
  * @param sheet the target sheet
- * @param values the values to be put in the columns
+ * @param values the values to be put in the columns (list of columns)
  */
 export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
   if (!values.length || !values[0].length) {
@@ -74,6 +80,9 @@ export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
   const nRows = sheet.getMaxRows();
   const prevLastCol = sheet.getRange(1, prevNCols, nRows, 1);
 
+  // convert values from list of cols to list of rows
+  values = transpose(values);
+
   // if the last col is empty, insert data in it
   if (
     prevLastCol
@@ -81,13 +90,7 @@ export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
       .flat()
       .every(v => !v)
   ) {
-    const colValues = [];
-
-    for (const row of values) {
-      colValues.push([row.pop()]);
-    }
-
-    setValues(prevLastCol, colValues);
+    setValues(prevLastCol, values.pop());
   }
 
   if (values.length && values[0].length) {

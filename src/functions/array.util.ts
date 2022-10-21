@@ -13,3 +13,9 @@ export const split = (arr: any[], sep: any | ((o: any) => boolean)) =>
     },
     [[]],
   );
+
+/**
+ * Transpose a 2D array.
+ * @example transpose([[1, 2, 3, 4], [5, 6, 7, 8]]) -> [[1, 5], [2, 6], [3, 7], [4, 8]]
+ */
+export const transpose = (mat: any[][]) => mat.reduce((acc, cur) => cur.map((_, i) => (acc[i] || []).concat(cur[i])), []);
