@@ -77,26 +77,5 @@ export const setValues = (range: Range, values: any[][]): void => {
   range.setValues(values);
 };
 
-/** Delete a `row` if it's not a header nor the last content row, otherwise clear it's content and retore the formulas. */
-export const safeDeleteRow = (range: Range, headers = range.getSheet().getFrozenRows()): void => {
-  const sheet = range.getSheet();
-  const rowPos = range.getRow();
-  const rowRange = sheet.getRange(rowPos, 1, 1, sheet.getMaxColumns());
-
-  if (sheet.getMaxRows() - headers === 1) {
-    // in case except for the headers there's only this row, clear
-    // it's content and restore the formulas instead of deleting it
-
-    const formulas = rowRange.getFormulas();
-
-    rowRange.clearContent().uncheck().setFormulas(formulas);
-  } else if (rowPos > headers) {
-    // in case there's many other rows and
-    // target row is not a header, delete it
-
-    sheet.deleteRow(rowPos);
-  }
-};
-
 /** Fetch a named range's value. */
 export const getNamedValue = (name: string): string => GS.ss.getRangeByName(name).getValue();

@@ -103,3 +103,41 @@ export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
     setValues(newRange, values);
   }
 };
+
+/** Delete a row if it's not a header nor the last content row, otherwise clear it's content and restore the formulas. */
+export const safeDeleteRow = (sheet: Sheet, rowPos: number, headers = sheet.getFrozenRows()): void => {
+  const rowRange = sheet.getRange(rowPos, 1, 1, sheet.getMaxColumns());
+
+  if (sheet.getMaxRows() - headers === 1) {
+    // in case except for the headers there's only this row, clear
+    // it's content and restore the formulas instead of deleting it
+
+    const formulas = rowRange.getFormulas();
+
+    rowRange.clearContent().uncheck().setFormulas(formulas);
+  } else if (rowPos > headers) {
+    // in case there's many other rows and
+    // target row is not a header, delete it
+
+    sheet.deleteRow(rowPos);
+  }
+};
+
+/** Delete a column if it's not a header nor the last content column, otherwise clear it's content and restore the formulas. */
+export const safeDeleteCol = (sheet: Sheet, colPos: number, headers = sheet.getFrozenColumns()): void => {
+  const colRange = sheet.getRange(1, colPos, sheet.getMaxRows(), 1);
+
+  if (sheet.getMaxColumns() - headers === 1) {
+    // in case except for the headers there's only this col, clear
+    // it's content and restore the formulas instead of deleting it
+
+    const formulas = colRange.getFormulas();
+
+    colRange.clearContent().uncheck().setFormulas(formulas);
+  } else if (colPos > headers) {
+    // in case there's many other cols and
+    // target col is not a header, delete it
+
+    sheet.deleteColumn(colPos);
+  }
+};
