@@ -34,14 +34,14 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
   const prevNRows = sheet.getMaxRows();
   const newRowsData = data.map(mapFn);
   const nColsNewRows = newRowsData[0].length;
-  const prevLastRow = sheet.getRange(prevNRows, 1, 1, newRowsData.length);
+  const prevLastRow = sheet.getRange(prevNRows, 1, 1, nColsNewRows);
 
-  // if the last row is empty, insert data in it
+  // insert data in the first row if it's empty
   if (
     prevLastRow
       .getValues()
       .flat()
-      .every(v => !v)
+      .every((v, i) => !v || newRowsData[newRowsData.length - 1][i] === undefined)
   ) {
     setValues(prevLastRow, [newRowsData.pop()]);
   }
@@ -68,11 +68,11 @@ export const clearSheet = (sheet: Sheet, headers = sheet.getFrozenRows()) =>
 
 /**
  * Create new columns in `sheet` and set their first cells' values to `headerValues` and restore formulas in them.
+ * @param data the values to be put in the columns (list of columns)
  * @param sheet the target sheet
- * @param values the values to be put in the columns (list of columns)
  */
-export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
-  if (!values.length || !values[0].length) {
+export const addColsToSheet = (data: any[][], sheet: Sheet): void => {
+  if (!data.length || !data[0].length) {
     return;
   }
 
@@ -81,7 +81,7 @@ export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
   const prevLastCol = sheet.getRange(1, prevNCols, nRows, 1);
 
   // convert values from list of cols to list of rows
-  values = transpose(values);
+  data = transpose(data);
 
   // if the last col is empty, insert data in it
   if (
@@ -90,17 +90,17 @@ export const addColsToSheet = (sheet: Sheet, values: any[][]): void => {
       .flat()
       .every(v => !v)
   ) {
-    setValues(prevLastCol, values.pop());
+    setValues(prevLastCol, data.pop());
   }
 
-  if (values.length && values[0].length) {
-    const newRange = sheet.insertColumnsAfter(prevNCols, values[0].length).getRange(1, prevNCols + 1, values.length, values[0].length);
+  if (data.length && data[0].length) {
+    const newRange = sheet.insertColumnsAfter(prevNCols, data[0].length).getRange(1, prevNCols + 1, data.length, data[0].length);
 
     // restore formulas on the new range
     copyFormulas(sheet.getRange(1, prevNCols, nRows, 1), newRange);
 
     // write data to the new range
-    setValues(newRange, values);
+    setValues(newRange, data);
   }
 };
 

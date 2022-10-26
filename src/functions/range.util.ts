@@ -24,7 +24,7 @@ export const getRangeBelow = (header: Range | string): Range | null => {
   const nCols = header.getNumColumns();
   const nRows = sheet.getMaxRows();
 
-  return firstRow >= nRows ? null : sheet.getRange(firstRow, firstCol, nRows - (firstRow - 1), nCols);
+  return firstRow > nRows ? null : sheet.getRange(firstRow, firstCol, nRows - (firstRow - 1), nCols);
 };
 
 /** Check if two ranges overlap. */
