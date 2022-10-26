@@ -79,3 +79,10 @@ export const setValues = (range: Range, values: any[][]): void => {
 
 /** Fetch a named range's value. */
 export const getNamedValue = (name: string): string => GS.ss.getRangeByName(name).getValue();
+
+/** Clear a range's content + uncheck checkboxes but keep formulas. */
+export const safeClearContent = (range: Range): void => {
+  const formulas = range.getFormulas();
+
+  range.clearContent().uncheck().setFormulas(formulas);
+};

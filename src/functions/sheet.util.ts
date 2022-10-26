@@ -1,6 +1,6 @@
 import { Range, Sheet } from '@lib/models';
 import { transpose } from './array.util';
-import { copyFormulas, setValues } from './range.util';
+import { copyFormulas, safeClearContent, setValues } from './range.util';
 
 export const isSameSheet = (a: Sheet, b: Sheet): boolean => a.getSheetId() === b.getSheetId();
 
@@ -41,7 +41,7 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
     prevLastRow
       .getValues()
       .flat()
-      .every((v, i) => !v || newRowsData[newRowsData.length - 1][i] === undefined)
+      .every((v, i) => v === undefined || v === '' || newRowsData[newRowsData.length - 1][i] === undefined)
   ) {
     setValues(prevLastRow, [newRowsData.pop()]);
   }
@@ -80,18 +80,18 @@ export const addColsToSheet = (data: any[][], sheet: Sheet): void => {
   const nRows = sheet.getMaxRows();
   const prevLastCol = sheet.getRange(1, prevNCols, nRows, 1);
 
-  // convert values from list of cols to list of rows
-  data = transpose(data);
-
-  // if the last col is empty, insert data in it
+  // insert data in the first col if it's empty
   if (
     prevLastCol
       .getValues()
       .flat()
-      .every(v => !v)
+      .every((v, i) => v === undefined || v === '' || data[data.length - 1][i] === undefined)
   ) {
-    setValues(prevLastCol, data.pop());
+    setValues(prevLastCol, transpose([data.pop()]));
   }
+
+  // convert values from list of cols to list of rows
+  data = transpose(data);
 
   if (data.length && data[0].length) {
     const newRange = sheet.insertColumnsAfter(prevNCols, data[0].length).getRange(1, prevNCols + 1, data.length, data[0].length);
@@ -111,14 +111,10 @@ export const safeDeleteRow = (sheet: Sheet, rowPos: number, headers = sheet.getF
   if (sheet.getMaxRows() - headers === 1) {
     // in case except for the headers there's only this row, clear
     // it's content and restore the formulas instead of deleting it
-
-    const formulas = rowRange.getFormulas();
-
-    rowRange.clearContent().uncheck().setFormulas(formulas);
+    safeClearContent(rowRange);
   } else if (rowPos > headers) {
     // in case there's many other rows and
     // target row is not a header, delete it
-
     sheet.deleteRow(rowPos);
   }
 };
@@ -130,14 +126,10 @@ export const safeDeleteCol = (sheet: Sheet, colPos: number, headers = sheet.getF
   if (sheet.getMaxColumns() - headers === 1) {
     // in case except for the headers there's only this col, clear
     // it's content and restore the formulas instead of deleting it
-
-    const formulas = colRange.getFormulas();
-
-    colRange.clearContent().uncheck().setFormulas(formulas);
+    safeClearContent(colRange);
   } else if (colPos > headers) {
     // in case there's many other cols and
     // target col is not a header, delete it
-
     sheet.deleteColumn(colPos);
   }
 };
