@@ -54,7 +54,12 @@ export const setValues = (range: Range, values: any[][]): void => {
   const nCols = range.getNumColumns();
 
   if (!nRows || !nCols || values.length !== nRows) {
-    throw new Error('The `range` and `values` shapes do not match.');
+    throw new Error(
+      'The `range` and `values` shapes do not match.\n'.concat(
+        `range: ${nRows}x${nCols}\n`,
+        `values: ${values.length}x${values[0].length}`,
+      ),
+    );
   }
 
   const prevFormulas = range.getFormulas();
@@ -64,7 +69,12 @@ export const setValues = (range: Range, values: any[][]): void => {
   // for the cell's previous formula or value
   for (let i = 0; i < nRows; i++) {
     if (values[i].length !== nCols) {
-      throw new Error('The `range` and `values` shapes do not match.');
+      throw new Error(
+        'The `range` and `values` shapes do not match.\n'.concat(
+          `range: ${nRows}x${nCols}\n`,
+          `values: ${values.length}x${values[i].length}`,
+        ),
+      );
     }
 
     for (let j = 0; j < nCols; j++) {
