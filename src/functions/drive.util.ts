@@ -37,7 +37,7 @@ export const copyInsides = (
   while (folders.hasNext()) {
     const folder = folders.next();
 
-    copyFolderTo(formatFilename(folder.getName()), folder, targetDir);
+    copyFolderTo(formatFilename(folder.getName()), folder, targetDir, formatFilename, processFile);
   }
 
   while (files.hasNext()) {
