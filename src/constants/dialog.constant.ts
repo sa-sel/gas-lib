@@ -4,6 +4,7 @@ export const enum DialogTitle {
   Error = 'Erro!',
   InProgress = 'Processando...',
   Success = 'Sucesso!',
+  AccessDenied = 'Acesso Negado!',
 }
 
 export const enum DialogMessage {
