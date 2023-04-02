@@ -12,6 +12,16 @@ export const copyFormulas = (reference: Range, target: Range): void => {
   target.clearContent().setValues(targetValues).setFormulas(formulas);
 };
 
+/** Copy format from `reference` to `target`. */
+export const copyFormat = (reference: Range, target: Range): void => {
+  const startRow = target.getRow();
+  const endRow = startRow + target.getNumRows() - 1;
+  const startCol = target.getColumn();
+  const endCol = startCol + target.getNumColumns() - 1;
+
+  reference.copyFormatToRange(reference.getSheet(), startCol, endCol, startRow, endRow);
+};
+
 /** Select the whole range directly below the received `header`. */
 export const getRangeBelow = (header: Range | string): Range | null => {
   if (typeof header === 'string') {
