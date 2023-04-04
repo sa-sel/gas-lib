@@ -39,3 +39,8 @@ export const input = (
 
   return inputValue;
 };
+
+/** Alert user with an OK button. */
+export const alert = (dialog: DialogModel): void => {
+  GS.ssui.alert(dialog.title, dialog.body, GS.ssui.ButtonSet.OK);
+};
