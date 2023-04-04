@@ -3,9 +3,9 @@ import { DialogModel } from '@lib/models';
 
 /** Prompt use for YES/NO confirmatin and run a function if YES. */
 export const confirm = (dialog: DialogModel, fn: () => void) => {
-  const response = GS.ssui.prompt(dialog.title, dialog.body, GS.ssui.ButtonSet.YES_NO);
+  const response = GS.ssui.alert(dialog.title, dialog.body, GS.ssui.ButtonSet.YES_NO);
 
-  switch (response.getSelectedButton()) {
+  switch (response) {
     case GS.ssui.Button.YES: {
       fn();
       break;
