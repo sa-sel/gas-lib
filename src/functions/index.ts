@@ -3,6 +3,7 @@ export * from './data.util';
 export * from './date.util';
 export * from './dialog.util';
 export * from './drive.util';
+export * from './folder.util';
 export * from './function.util';
 export * from './range.util';
 export * from './sheet.util';
