@@ -1,13 +1,27 @@
-import { Document, Sheet, Spreadsheet } from '@lib/models';
+import { Document, File, Spreadsheet } from '@lib/models';
 
-export const substituteVariables = (variables: Record<string, string>, template: Spreadsheet | Sheet | Document): void => {
-  const isSheet = !!(template as Spreadsheet).createTextFinder;
+export const substituteVariables = (template: File, variables: Record<string, string>): void => {
+  const isSheet = template.getMimeType() === MimeType.GOOGLE_SHEETS;
+
+  if (!isSheet && template.getMimeType() !== MimeType.GOOGLE_DOCS) {
+    throw TypeError(`Template ${template.getName()} should be Sheet or Doc, but instead is ${template.getMimeType()}.`);
+  }
+
+  const converted = isSheet ? SpreadsheetApp.open(template) : DocumentApp.openById(template.getId());
+  const sheet = converted as Spreadsheet;
+  const doc = converted as Document;
 
   Object.entries(variables).forEach(([variable, value]) => {
     if (isSheet) {
-      (template as Spreadsheet).createTextFinder(variable).replaceAllWith(value);
+      sheet.createTextFinder(variable).replaceAllWith(value);
     } else {
-      (template as Document).getBody().replaceText(variable, value);
+      doc.getHeader().replaceText(variable, value);
+      doc.getBody().replaceText(variable, value);
+      doc.getFooter().replaceText(variable, value);
     }
   });
+
+  if (!isSheet) {
+    doc.saveAndClose();
+  }
 };
