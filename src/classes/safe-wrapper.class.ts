@@ -41,7 +41,7 @@ export class SafeWrapper {
    * Wrap the call to a feature function with authorizer and error logging.
    * @param fn feature function to be wrapped (injection for logger and authorizer)
    */
-  wrap(...args: Parameters<typeof this.getWrapped>): void {
+  wrap(...args: Parameters<typeof SafeWrapper.prototype.getWrapped>): void {
     return this.getWrapped(...args)();
   }
 }
