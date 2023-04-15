@@ -31,27 +31,29 @@ export const appendDataToSheet = <T>(data: T[], sheet: Sheet, mapFn: (obj: T) =>
     return null;
   }
 
-  let nextRow = sheet.getLastRow() + 1;
+  let nNextRow = sheet.getLastRow() + 1;
+  const nFrozenRows = sheet.getFrozenRows();
   const newRowsData = data.map(mapFn);
   const nColsNewRows = newRowsData[0].length;
-  const emptyRow = sheet.getRange(nextRow, 1, 1, nColsNewRows);
+  const emptyRow = sheet.getRange(nNextRow, 1, 1, nColsNewRows);
 
   // insert data in the first empty row (if there's any)
+  // tries to identify borders in the sheet
   if (
-    nextRow < sheet.getMaxRows() &&
+    (nNextRow < sheet.getMaxRows() || nNextRow === nFrozenRows + 1) &&
     emptyRow
       .getValues()
       .flat()
       .every((v, i) => v === undefined || v === '' || newRowsData[newRowsData.length - 1][i] === undefined)
   ) {
     setValues(emptyRow, [newRowsData.pop()]);
-    nextRow++;
+    nNextRow++;
   }
 
   // if there's any data remaining to be inserted
   if (newRowsData.length) {
-    const newRange = sheet.insertRowsAfter(nextRow - 1, newRowsData.length).getRange(nextRow, 1, newRowsData.length, nColsNewRows);
-    const prevRange = sheet.getRange(nextRow - 1, 1, 1, sheet.getMaxColumns());
+    const newRange = sheet.insertRowsAfter(nNextRow - 1, newRowsData.length).getRange(nNextRow, 1, newRowsData.length, nColsNewRows);
+    const prevRange = sheet.getRange(nNextRow - 1, 1, 1, sheet.getMaxColumns());
 
     // restore formulas on the new range
     copyFormulas(prevRange, newRange);
