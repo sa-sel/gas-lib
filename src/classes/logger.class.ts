@@ -1,5 +1,5 @@
 import { DialogMessage, DialogTitle, GS } from '@lib/constants';
-import { appendDataToSheet, formatTimestamp } from '@lib/functions';
+import { appendDataToSheet } from '@lib/functions';
 import { LogObject } from '@lib/models';
 
 export class Logger {
@@ -21,7 +21,7 @@ export class Logger {
         {
           feature: this.feature,
           user: this.user,
-          timestamp: formatTimestamp(new Date()),
+          timestamp: new Date().formatToTimestamp(),
           event,
           comment,
         },
