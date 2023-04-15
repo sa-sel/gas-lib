@@ -1,10 +1,10 @@
-import { Logger } from '@lib/classes';
 import { DialogTitle, GS } from '@lib/constants';
+import { SheetLogger } from './sheet-logger.class';
 
 export class Authorizer {
   public readonly user: string;
 
-  constructor(public readonly allowedEmails: string[], private readonly logger?: Logger) {
+  constructor(public readonly allowedEmails: string[], private readonly logger?: SheetLogger) {
     this.user = Session.getActiveUser().getEmail();
   }
 

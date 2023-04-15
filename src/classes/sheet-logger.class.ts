@@ -2,7 +2,7 @@ import { DialogMessage, DialogTitle, GS } from '@lib/constants';
 import { appendDataToSheet } from '@lib/functions';
 import { LogObject } from '@lib/models';
 
-export class Logger {
+export class SheetLogger {
   constructor(
     public readonly feature: string,
     private readonly spreadsheet = GS.ss,
@@ -35,7 +35,7 @@ export class Logger {
     let comment = `O usuário ${this.user} não tem permissão para executar a função "${this.feature}".`;
 
     if (allowedEmails?.length) {
-      comment += `\nOs usuários autorizados são: ${allowedEmails.join(', ')}.`;
+      comment += `\nOs usuários autorizados são: ${allowedEmails.toString()}.`;
     }
 
     this.log(DialogTitle.AccessDenied, comment);

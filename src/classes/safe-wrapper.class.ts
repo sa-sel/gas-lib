@@ -1,15 +1,15 @@
 import { Authorizer } from './auth.class';
-import { Logger } from './logger.class';
+import { SheetLogger } from './sheet-logger.class';
 
 /** Create handle logger/authorizer boilerplate for feature. */
 export class SafeWrapper {
-  constructor(private readonly logger: Logger, private readonly auth?: Authorizer) {
+  constructor(private readonly logger: SheetLogger, private readonly auth?: Authorizer) {
     this.logger = logger;
     this.auth = auth;
   }
 
   static factory(feature: string, allowedEmails?: string[] | (() => string[])): SafeWrapper {
-    const logger = new Logger(feature);
+    const logger = new SheetLogger(feature);
     const auth = allowedEmails && new Authorizer(typeof allowedEmails === 'function' ? allowedEmails() : allowedEmails, logger);
 
     return new this(logger, auth);
@@ -20,7 +20,7 @@ export class SafeWrapper {
    * @param fn feature function to be wrapped (injection for logger and authorizer)
    * @returns wrapped function
    */
-  getWrapped(fn: (logger?: Logger, auth?: Authorizer) => void): () => void {
+  getWrapped(fn: (logger?: SheetLogger, auth?: Authorizer) => void): () => void {
     return () => {
       if (this.auth && !this.auth.ok) {
         this.logger.accessDenied(this.auth.allowedEmails);
