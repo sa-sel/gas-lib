@@ -31,7 +31,13 @@ export class Logger {
     );
   }
 
-  accessDenied(comment = `O usuário ${this.user} não tem permissão para executar a função "${this.feature}".`) {
+  accessDenied(allowedEmails?: string[]) {
+    let comment = `O usuário ${this.user} não tem permissão para executar a função "${this.feature}".`;
+
+    if (allowedEmails?.length) {
+      comment += `\nOs usuários autorizados são: ${allowedEmails.join(', ')}.`;
+    }
+
     this.log(DialogTitle.AccessDenied, comment);
   }
 

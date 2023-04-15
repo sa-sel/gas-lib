@@ -8,9 +8,9 @@ export class SafeWrapper {
     this.auth = auth;
   }
 
-  static factory(feature: string, allowedEmails?: string[]): SafeWrapper {
+  static factory(feature: string, allowedEmails?: string[] | (() => string[])): SafeWrapper {
     const logger = new Logger(feature);
-    const auth = allowedEmails && new Authorizer(allowedEmails, logger);
+    const auth = allowedEmails && new Authorizer(typeof allowedEmails === 'function' ? allowedEmails() : allowedEmails, logger);
 
     return new this(logger, auth);
   }
@@ -23,7 +23,7 @@ export class SafeWrapper {
   getWrapped(fn: (logger?: Logger, auth?: Authorizer) => void): () => void {
     return () => {
       if (this.auth && !this.auth.ok) {
-        this.logger.accessDenied();
+        this.logger.accessDenied(this.auth.allowedEmails);
 
         return;
       }

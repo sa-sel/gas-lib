@@ -19,9 +19,13 @@ export class Authorizer {
     }
 
     this.logger
-      ? this.logger.accessDenied()
+      ? this.logger.accessDenied(this.allowedEmails)
       : GS.ss.toast(`O usuário ${this.user} não tem permissão para acessar este recurso.`, DialogTitle.AccessDenied);
 
-    throw new Error(`Access denied for user ${this.user} (resource ${this.logger?.feature ?? 'not specified'}).`);
+    throw new Error(
+      `Access denied for user ${this.user} (resource ${
+        this.logger?.feature ?? 'not specified'
+      }).\nAllowed: ${this.allowedEmails.toLocaleString()}.`,
+    );
   }
 }
