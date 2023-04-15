@@ -27,5 +27,13 @@ Array.prototype.split = function <T>(sep: T | ((o: T) => boolean)): T[][] {
 };
 
 Array.prototype.pushIf = function <T>(cond: any, ...items: T[]): number {
-  return cond ? (this as T[]).push(...items) : (this as T[]).length;
+  return cond ? this.push(...items) : this.length;
+};
+
+Array.prototype.toString = function (): string {
+  return `${this.slice(0, -1).join(', ')} e ${this[this.length - 1]}`;
+};
+
+Array.prototype.toLocaleString = function (): string {
+  return `${this.slice(0, -1).join(', ')} and ${this[this.length - 1]}`;
 };
