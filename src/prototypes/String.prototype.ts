@@ -1,18 +1,26 @@
-import { removeAccents } from '@lib/functions';
+/* eslint-disable @typescript-eslint/no-this-alias */
 
 declare global {
   export interface String {
+    /**
+     * Remove accents/diacritics from a string.
+     * @see https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript
+     */
     removeAccents(): string;
+    /** "+55 16 99999-9999" */
     asPhoneNumber(): string;
   }
 }
 
 String.prototype.removeAccents = function (): string {
-  return removeAccents(this);
+  const str: string = this;
+
+  return str.normalize('NFD').replace(/\p{Diacritic}/gu, '');
 };
 
 String.prototype.asPhoneNumber = function (): string {
-  const nums: string = this.replace(/\D/g, '');
+  const str: string = this;
+  const nums: string = str.replace(/\D/g, '');
 
   switch (nums.length) {
     case 13:
@@ -37,3 +45,5 @@ String.prototype.asPhoneNumber = function (): string {
       return nums;
   }
 };
+
+export default {};

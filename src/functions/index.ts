@@ -1,6 +1,5 @@
 export * from './array.util';
 export * from './data.util';
-export * from './date.util';
 export * from './dialog.util';
 export * from './drive.util';
 export * from './folder.util';

@@ -1,11 +1,16 @@
-import { pad } from '@lib/functions';
+/* eslint-disable @typescript-eslint/no-this-alias */
 
 declare global {
   export interface Number {
-    pad(width: number): string;
+    /** Convert number to string and add leading zeroes (padding). */
+    withLeadingZeros(width: number): string;
   }
 }
 
-Number.prototype.pad = function (width: number): string {
-  return pad(this, width);
+Number.prototype.withLeadingZeros = function (width: number): string {
+  const n: number = this;
+
+  return n.toString().padStart(width, '0');
 };
+
+export default {};

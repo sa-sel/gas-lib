@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
+
 import { split } from '@lib/functions';
 
 declare global {
@@ -10,7 +12,6 @@ declare global {
      * @example [1, 2, 1, 2, 3, 4, 1, 1, 6].split(1) -> [[], [2], [2, 3, 4], [], [6]]
      */
     split(sep: T | ((o: T) => boolean)): T[][];
-
     /**
      * Appends new elements to the end of an array
      *
@@ -23,17 +24,27 @@ declare global {
 }
 
 Array.prototype.split = function <T>(sep: T | ((o: T) => boolean)): T[][] {
-  return split(this, sep);
+  const arr: Array<T> = this;
+
+  return split(arr, sep);
 };
 
 Array.prototype.pushIf = function <T>(cond: any, ...items: T[]): number {
-  return cond ? this.push(...items) : this.length;
+  const arr: Array<T> = this;
+
+  return cond ? arr.push(...items) : arr.length;
 };
 
-Array.prototype.toString = function (): string {
-  return `${this.slice(0, -1).join(', ')} e ${this[this.length - 1]}`;
+Array.prototype.toString = function <T>(): string {
+  const arr: Array<T> = this;
+
+  return `${arr.slice(0, -1).join(', ')} e ${arr[arr.length - 1]}`;
 };
 
-Array.prototype.toLocaleString = function (): string {
-  return `${this.slice(0, -1).join(', ')} and ${this[this.length - 1]}`;
+Array.prototype.toLocaleString = function <T>(): string {
+  const arr: Array<T> = this;
+
+  return `${arr.slice(0, -1).join(', ')} and ${arr[arr.length - 1]}`;
 };
+
+export default {};

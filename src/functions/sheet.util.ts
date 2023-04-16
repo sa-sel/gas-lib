@@ -21,6 +21,10 @@ export const removeEmptyRows = (sheet: Sheet, headers = sheet.getFrozenRows()) =
 };
 
 /**
+ * Append rows with data to the end of a sheet, maintaining format and formulas form the previous row. Tries to identify sheet borders
+ * with empty rows.
+ * Note that if the sheet you are appending to contains cells with checkboxes, their FALSE value must be mapped to empty string.
+ *
  * @param data data to be appended
  * @param sheet sheet to append `data` to
  * @param mapFn function to map each `data` element to a row (cells can be skipped using `undefined`)

@@ -21,7 +21,7 @@ export class SheetLogger {
         {
           feature: this.feature,
           user: this.user,
-          timestamp: new Date().formatToTimestamp(),
+          timestamp: new Date().asTimestamp(),
           event,
           comment,
         },

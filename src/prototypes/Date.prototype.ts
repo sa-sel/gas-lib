@@ -1,16 +1,32 @@
-import { formatDate, formatTimestamp } from '@lib/functions';
+/* eslint-disable @typescript-eslint/no-this-alias */
 
 declare global {
   export interface Date {
-    formatToDate(): string;
-    formatToTimestamp(): string;
+    /** "DD/MM/YYYY" */
+    asDateString(): string;
+    /** "DD/MM/YYYY hh:mm:ss" */
+    asTimestamp(): string;
+    /** "hh:mm:ss" */
+    asTime(): string;
   }
 }
 
-Date.prototype.formatToDate = function (): string {
-  return formatDate(this);
+Date.prototype.asDateString = function (): string {
+  const date: Date = this;
+
+  return `${date.getDate().withLeadingZeros(2)}/${(date.getMonth() + 1).withLeadingZeros(2)}/${date.getFullYear()}`;
 };
 
-Date.prototype.formatToTimestamp = function (): string {
-  return formatTimestamp(this);
+Date.prototype.asTime = function (): string {
+  const date: Date = this;
+
+  return `${date.getHours().withLeadingZeros(2)}:${date.getMinutes().withLeadingZeros(2)}:${date.getSeconds().withLeadingZeros(2)}`;
 };
+
+Date.prototype.asTimestamp = function (): string {
+  const date: Date = this;
+
+  return `${date.asDateString()} ${date.asTime()}`;
+};
+
+export default {};
