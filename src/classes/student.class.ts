@@ -12,11 +12,11 @@ export class Student implements StudentDataModel {
 
   constructor({ name, nickname, nUsp, phone, emphasis, email, birthday }: StudentDataModel) {
     this.name = name.trim();
-    this.nickname = nickname.trim();
+    this.nickname = nickname?.trim();
     this.nUsp = nUsp.trim();
-    this.phone = phone.trim();
+    this.phone = phone?.trim();
     this.emphasis = emphasis;
-    this.email = email.trim();
+    this.email = email?.trim();
     this.birthday = birthday;
   }
 
