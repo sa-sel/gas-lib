@@ -1,6 +1,5 @@
 export const enum MeetingVariable {
   Clerk = '{{meetingClerk}}',
-  Type = '{{meetingType}}',
   Start = '{{meetingStart}}',
   End = '{{meetingEnd}}',
   Date = '{{meetingDate}}',

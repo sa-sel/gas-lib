@@ -26,5 +26,5 @@ export const substituteVariablesInFile = (template: File, variables: Record<stri
   }
 };
 
-export const substituteVariableInString = (str: string, variables: Record<string, string>): string =>
+export const substituteVariablesInString = (str: string, variables: Record<string, string>): string =>
   Object.entries(variables).reduce((result, [variable, value]) => result.replaceAll(variable, value), str);
