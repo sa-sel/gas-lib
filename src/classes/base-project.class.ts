@@ -10,6 +10,7 @@ export abstract class BaseProject {
   director: Student;
   members: Student[];
   folder: Folder;
+  departmentFolder?: Folder;
 
   readonly fullDepartmentName: string;
 
@@ -53,12 +54,22 @@ export abstract class BaseProject {
     return this;
   }
 
-  toString(): string {
-    return `${this.name} (${this.edition})`;
+  setFolder(folder?: Folder): this {
+    if (folder) {
+      this.folder = folder;
+
+      const parentsIt = folder.getParents();
+
+      if (parentsIt.hasNext()) {
+        this.departmentFolder = parentsIt.next();
+      }
+    }
+
+    return this;
   }
 
-  protected processStringTemplate(str: string, templateVariables = this.templateVariables): string {
-    return Object.entries(templateVariables).reduce((result, [variable, value]) => result.replaceAll(variable, value), str);
+  toString(): string {
+    return `${this.name} (${this.edition})`;
   }
 
   protected get templateVariables(): Record<ProjectVariable, string> {
@@ -73,7 +84,7 @@ export abstract class BaseProject {
       [ProjectVariable.Name]: this.name,
       [ProjectVariable.Start]: this.start.asDateString(),
       [ProjectVariable.NumMembers]: this.members.length.toString() || ProjectVariable.NumMembers,
-      [ProjectVariable.Members]: this.members.reduce((acc, cur) => `${acc}• ${cur.toString()}\n`, '') || ProjectVariable.Members,
+      [ProjectVariable.Members]: this.members.toBulletpoints() || ProjectVariable.Members,
       [ProjectVariable.MembersHtmlList]: this.members.reduce((a, c) => `${a}${c.toHtmlLi()}\n`, '') || ProjectVariable.MembersHtmlList,
       [ProjectVariable.FolderUrl]: this.folder?.getUrl() || ProjectVariable.FolderUrl,
     };

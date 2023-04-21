@@ -4,6 +4,8 @@ declare global {
   export interface Date {
     /** "DD/MM/YYYY" */
     asDateString(): string;
+    /** "YYYY/MM/DD" */
+    asReverseDateString(): string;
     /** "DD/MM/YYYY hh:mm:ss" */
     asTimestamp(): string;
     /** "hh:mm:ss" */
@@ -15,6 +17,12 @@ Date.prototype.asDateString = function (): string {
   const date: Date = this;
 
   return `${date.getDate().withLeadingZeros(2)}/${(date.getMonth() + 1).withLeadingZeros(2)}/${date.getFullYear()}`;
+};
+
+Date.prototype.asReverseDateString = function (): string {
+  const date: Date = this;
+
+  return `${date.getFullYear()}/${(date.getMonth() + 1).withLeadingZeros(2)}/${date.getDate().withLeadingZeros(2)}`;
 };
 
 Date.prototype.asTime = function (): string {

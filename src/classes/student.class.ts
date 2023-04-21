@@ -11,13 +11,23 @@ export class Student implements StudentDataModel {
   public readonly birthday?: Date;
 
   constructor({ name, nickname, nUsp, phone, emphasis, email, birthday }: StudentDataModel) {
-    this.name = name;
-    this.nickname = nickname;
-    this.nUsp = nUsp;
-    this.phone = phone;
+    this.name = name.trim();
+    this.nickname = nickname.trim();
+    this.nUsp = nUsp.trim();
+    this.phone = phone.trim();
     this.emphasis = emphasis;
-    this.email = email;
+    this.email = email.trim();
     this.birthday = birthday;
+  }
+
+  static fromNameNicknameString(nameNickname: string, args: Omit<StudentDataModel, 'name' | 'nickname'>): Student {
+    const [name, nickname] = nameNickname.split(/(.+?)\((.+?)\)/).filter(e => e);
+
+    return new this({
+      name,
+      nickname,
+      ...args,
+    });
   }
 
   toString(): string {

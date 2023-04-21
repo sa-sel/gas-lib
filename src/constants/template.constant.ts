@@ -1,9 +1,11 @@
 export const enum MeetingVariable {
-  MeetingType = '{{meetingType}}',
-  MeetingStart = '{{meetingStart}}',
-  MeetingEnd = '{{meetingEnd}}',
-  MeetingDate = '{{meetingDate}}',
-  MeetingDateSort = '{{meetingDateSort}}',
+  Clerk = '{{meetingClerk}}',
+  Type = '{{meetingType}}',
+  Start = '{{meetingStart}}',
+  End = '{{meetingEnd}}',
+  Date = '{{meetingDate}}',
+  ReverseDate = '{{meetingDateSort}}',
+  MeetingAttendees = '{{meetingAttendees}}',
 }
 
 export const enum ProjectVariable {

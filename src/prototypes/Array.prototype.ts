@@ -20,6 +20,8 @@ declare global {
      * @returns new length of the array
      */
     pushIf(cond: any, ...items: T[]): number;
+    /** Convert the array to a bulletpoint string. */
+    toBulletpoints(): string;
   }
 }
 
@@ -45,6 +47,12 @@ Array.prototype.toLocaleString = function <T>(): string {
   const arr: Array<T> = this;
 
   return `${arr.slice(0, -1).join(', ')} and ${arr[arr.length - 1]}`;
+};
+
+Array.prototype.toBulletpoints = function <T>(): string {
+  const arr: Array<T> = this;
+
+  return arr.reduce((acc, cur) => `${acc}• ${cur.toString()}\n`, '');
 };
 
 export default {};
