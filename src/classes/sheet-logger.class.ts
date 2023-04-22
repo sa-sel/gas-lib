@@ -16,6 +16,7 @@ export class SheetLogger {
 
   log(event: string, comment?: string, toast = true) {
     toast && GS.ss.toast(comment, event);
+    Logger.log(`[${event}]`, comment);
     appendDataToSheet<LogObject>(
       [
         {
