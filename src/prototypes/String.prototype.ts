@@ -9,6 +9,8 @@ declare global {
     removeAccents(): string;
     /** "+55 16 99999-9999" */
     asPhoneNumber(): string;
+    /** Check if string if a URL with HTTP/HTTPS protocol. */
+    isUrl(): boolean;
   }
 }
 
@@ -44,6 +46,19 @@ String.prototype.asPhoneNumber = function (): string {
     default:
       return nums;
   }
+};
+
+String.prototype.isUrl = function (): boolean {
+  let url: URL;
+  const str: string = this;
+
+  try {
+    url = new URL(str);
+  } catch {
+    return false;
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:';
 };
 
 export default {};
