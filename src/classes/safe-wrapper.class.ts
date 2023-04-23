@@ -1,16 +1,31 @@
+import { evaluate } from '@lib/functions';
+import { Sheet } from '@lib/models';
 import { Authorizer } from './auth.class';
 import { SheetLogger } from './sheet-logger.class';
 
 /** Create handle logger/authorizer boilerplate for feature. */
 export class SafeWrapper {
-  constructor(private readonly logger: SheetLogger, private readonly auth?: Authorizer) {
+  constructor(private readonly logger?: SheetLogger, private readonly auth?: Authorizer) {
     this.logger = logger;
     this.auth = auth;
   }
 
-  static factory(feature: string, allowedEmails?: string[] | (() => string[])): SafeWrapper {
-    const logger = new SheetLogger(feature);
-    const auth = allowedEmails && new Authorizer(typeof allowedEmails === 'function' ? allowedEmails() : allowedEmails, logger);
+  static factory(
+    feature: string,
+    {
+      loggingSheet: spreadsheet,
+      allowedEmails,
+    }: {
+      /** The spreadsheet to be used for logging. */
+      loggingSheet?: Sheet | (() => Sheet) | null;
+      allowedEmails?: string[] | (() => string[]);
+    },
+  ): SafeWrapper {
+    const ss = evaluate(spreadsheet);
+    const emails = evaluate(allowedEmails);
+
+    const logger = ss === null ? null : new SheetLogger(feature, ss);
+    const auth = emails && new Authorizer(emails, logger);
 
     return new this(logger, auth);
   }
@@ -23,7 +38,7 @@ export class SafeWrapper {
   getWrapped(fn: (logger?: SheetLogger, auth?: Authorizer) => void): () => void {
     return () => {
       if (this.auth && !this.auth.ok) {
-        this.logger.accessDenied(this.auth.allowedEmails);
+        this.logger?.accessDenied(this.auth.allowedEmails);
 
         return;
       }
@@ -31,7 +46,7 @@ export class SafeWrapper {
       try {
         fn(this.logger, this.auth);
       } catch (err) {
-        this.logger.error(`Ocorreu um erro inesperado:\n${err}`);
+        this.logger?.error(`Ocorreu um erro inesperado:\n${err}`);
         throw err;
       }
     };

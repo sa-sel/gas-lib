@@ -5,18 +5,13 @@ import { LogObject } from '@lib/models';
 export class SheetLogger {
   constructor(
     public readonly feature: string,
-    private readonly spreadsheet = GS.ss,
-    private readonly sheet = spreadsheet.getSheetByName('Logs'),
+    private readonly sheet = GS.ss?.getSheetByName('Logs'),
     private readonly user = Session.getActiveUser().getEmail(),
-  ) {
-    if (!sheet) {
-      throw new Error(`The spreadsheet "${this.spreadsheet.getName()}" does not have a 'Logs' sheet.`);
-    }
-  }
+  ) {}
 
   log(event: string, comment?: string, toast = true) {
-    toast && GS.ss.toast(comment, event);
-    Logger.log(`[${event}]`, comment);
+    toast && GS.ss?.toast(comment, event);
+    Logger.log(`[${event}]\n${comment}`);
     appendDataToSheet<LogObject>(
       [
         {
