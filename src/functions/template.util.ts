@@ -1,6 +1,6 @@
 import { Document, File, Spreadsheet } from '@lib/models';
 
-export const substituteVariablesInFile = (template: File, variables: Record<string, string>): void => {
+export const substituteVariablesInFile = (template: File, variables: Record<string, string>): File => {
   const isSheet = template.getMimeType() === MimeType.GOOGLE_SHEETS;
 
   if (!isSheet && template.getMimeType() !== MimeType.GOOGLE_DOCS) {
@@ -24,6 +24,8 @@ export const substituteVariablesInFile = (template: File, variables: Record<stri
   if (!isSheet) {
     doc.saveAndClose();
   }
+
+  return template;
 };
 
 export const substituteVariablesInString = (str: string, variables: Record<string, string>): string =>
