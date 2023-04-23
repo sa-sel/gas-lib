@@ -20,7 +20,7 @@ export const saveNewData = <T>({
 
   if (!allNewData.length) {
     newDataSheet.activate();
-    GS.ss.toast(`Nenhum dado foi encontrado na planilha "${newDataSheetName}".`, DialogTitle.Error);
+    GS.ss?.toast(`Nenhum dado foi encontrado na planilha "${newDataSheetName}".`, DialogTitle.Error);
 
     return;
   }
@@ -35,14 +35,14 @@ export const saveNewData = <T>({
 
   // append all valid data to the synced sheets
   if (validNewData.length) {
-    GS.ss.toast(`Os membros da planilha "${newDataSheetName}" estão sendo salvos.`, DialogTitle.InProgress);
+    GS.ss?.toast(`Os membros da planilha "${newDataSheetName}" estão sendo salvos.`, DialogTitle.InProgress);
 
     targetSheets.forEach(sheet => {
       appendDataToSheet(validNewData, sheet, obj => parseDataToRow(obj, sheet));
       safeCall(hooks?.afterAppend, sheet);
     });
 
-    GS.ss.toast(`Limpando os dados da planilha "${newDataSheetName}".`, DialogTitle.AlmostDone);
+    GS.ss?.toast(`Limpando os dados da planilha "${newDataSheetName}".`, DialogTitle.AlmostDone);
     clearSheet(newDataSheet);
   }
 
@@ -54,13 +54,13 @@ export const saveNewData = <T>({
         .setValues(invalidNewData.map(obj => parseDataToRow(obj, newDataSheet)))
         .activate();
     }
-    GS.ss.toast(
+    GS.ss?.toast(
       invalidDataErrorMessage ?? `Há linhas com dados inválidos/ausentes na planilha "${newDataSheetName}".`,
       `${DialogTitle.Error} Dados inválidos.`,
     );
   } else {
     safeCall(hooks?.success);
-    GS.ss.toast('Os dados foram salvos.', DialogTitle.Success);
+    GS.ss?.toast('Os dados foram salvos.', DialogTitle.Success);
   }
 };
 

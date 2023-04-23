@@ -4,16 +4,16 @@ import { DialogModel } from '@lib/models';
 
 /** Prompt use for YES/NO confirmatin and run a function if YES. */
 export const confirm = (dialog: DialogModel, fn: () => void, logger?: SheetLogger) => {
-  const response = GS.ssui.alert(dialog.title, dialog.body, GS.ssui.ButtonSet.YES_NO);
+  const response = GS.ui.alert(dialog.title, dialog.body, GS.ui.ButtonSet.YES_NO);
 
   switch (response) {
-    case GS.ssui.Button.YES: {
+    case GS.ui.Button.YES: {
       fn();
       break;
     }
 
     default: {
-      logger ? logger.aborted(DialogMessage.UserCanceled) : GS.ss.toast(DialogMessage.UserCanceled, DialogTitle.Aborted);
+      logger ? logger.aborted(DialogMessage.UserCanceled) : GS.ss?.toast(DialogMessage.UserCanceled, DialogTitle.Aborted);
     }
   }
 };
@@ -29,10 +29,10 @@ export const input = (
   const body = () => dialog.body + (inputValue === undefined ? '' : `\n\n${validationErrorMsg(inputValue)}`);
 
   do {
-    response = GS.ssui.prompt(dialog.title, body(), GS.ssui.ButtonSet.OK_CANCEL);
+    response = GS.ui.prompt(dialog.title, body(), GS.ui.ButtonSet.OK_CANCEL);
 
-    if (response.getSelectedButton() === GS.ssui.Button.CANCEL) {
-      GS.ss.toast(DialogMessage.UserCanceled, DialogTitle.Aborted);
+    if (response.getSelectedButton() === GS.ui.Button.CANCEL) {
+      GS.ss?.toast(DialogMessage.UserCanceled, DialogTitle.Aborted);
 
       return null;
     }
@@ -43,5 +43,5 @@ export const input = (
 
 /** Alert user with an OK button. */
 export const alert = (dialog: DialogModel): void => {
-  GS.ssui.alert(dialog.title, dialog.body, GS.ssui.ButtonSet.OK);
+  GS.ui.alert(dialog.title, dialog.body, GS.ui.ButtonSet.OK);
 };

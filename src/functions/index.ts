@@ -2,6 +2,7 @@ export * from './array.util';
 export * from './data.util';
 export * from './dialog.util';
 export * from './drive.util';
+export * from './email.util';
 export * from './folder.util';
 export * from './function.util';
 export * from './range.util';
