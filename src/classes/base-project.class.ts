@@ -20,6 +20,24 @@ export abstract class BaseProject {
     this.fullDepartmentName = this.department === SaDepartment.Administrative ? this.department : `Diretoria de ${this.department}`;
   }
 
+  get templateVariables(): Record<ProjectVariable, string> {
+    return {
+      [ProjectVariable.Department]: this.department || ProjectVariable.Department,
+      [ProjectVariable.FullDepartment]: this.fullDepartmentName || ProjectVariable.FullDepartment,
+      [ProjectVariable.Edition]: this.edition,
+      [ProjectVariable.Manager]: this.manager ? this.manager.toString() : ProjectVariable.Manager,
+      [ProjectVariable.Director]: this.director ? this.director.toString() : ProjectVariable.Director,
+      [ProjectVariable.ManagerEmail]: this.manager?.email || ProjectVariable.ManagerEmail,
+      [ProjectVariable.DirectorEmail]: this.director?.email || ProjectVariable.DirectorEmail,
+      [ProjectVariable.Name]: this.name,
+      [ProjectVariable.Start]: this.start.asDateString(),
+      [ProjectVariable.NumMembers]: this.members.length.toString() || ProjectVariable.NumMembers,
+      [ProjectVariable.Members]: this.members.toBulletpoints() || ProjectVariable.Members,
+      [ProjectVariable.MembersHtmlList]: this.members.reduce((a, c) => `${a}${c.toHtmlLi()}\n`, '') || ProjectVariable.MembersHtmlList,
+      [ProjectVariable.FolderUrl]: this.folder?.getUrl() || ProjectVariable.FolderUrl,
+    };
+  }
+
   setManager(manager?: Student): this {
     if (manager) {
       this.manager = manager;
@@ -70,23 +88,5 @@ export abstract class BaseProject {
 
   toString(): string {
     return `${this.name} (${this.edition})`;
-  }
-
-  protected get templateVariables(): Record<ProjectVariable, string> {
-    return {
-      [ProjectVariable.Department]: this.department || ProjectVariable.Department,
-      [ProjectVariable.FullDepartment]: this.fullDepartmentName || ProjectVariable.FullDepartment,
-      [ProjectVariable.Edition]: this.edition,
-      [ProjectVariable.Manager]: this.manager ? this.manager.toString() : ProjectVariable.Manager,
-      [ProjectVariable.Director]: this.director ? this.director.toString() : ProjectVariable.Director,
-      [ProjectVariable.ManagerEmail]: this.manager?.email || ProjectVariable.ManagerEmail,
-      [ProjectVariable.DirectorEmail]: this.director?.email || ProjectVariable.DirectorEmail,
-      [ProjectVariable.Name]: this.name,
-      [ProjectVariable.Start]: this.start.asDateString(),
-      [ProjectVariable.NumMembers]: this.members.length.toString() || ProjectVariable.NumMembers,
-      [ProjectVariable.Members]: this.members.toBulletpoints() || ProjectVariable.Members,
-      [ProjectVariable.MembersHtmlList]: this.members.reduce((a, c) => `${a}${c.toHtmlLi()}\n`, '') || ProjectVariable.MembersHtmlList,
-      [ProjectVariable.FolderUrl]: this.folder?.getUrl() || ProjectVariable.FolderUrl,
-    };
   }
 }
