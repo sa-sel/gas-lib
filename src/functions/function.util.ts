@@ -1,5 +1,13 @@
 export const isFn = (fn: any) => typeof fn === 'function';
 
+export const suppressError = <T>(fn: () => T): T | null => {
+  try {
+    return fn();
+  } catch {
+    return null;
+  }
+};
+
 /** Call a function if it exists. */
 export const safeCall = <T>(fn: (...args: any[]) => T, ...args: any[]) => fn && fn(...args);
 
