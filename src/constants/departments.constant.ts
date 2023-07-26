@@ -1,6 +1,9 @@
 export const enum SaDepartment {
   Academic = 'Atividades Acadêmicas',
   Administrative = 'Administrativo',
+  Presidency = 'Presidência',
+  VicePresidency = 'Vice-Presidência',
+  Secretary = 'Secretaria',
   Communications = 'Comunicação',
   Events = 'Eventos',
   Extension = 'Extensão',
