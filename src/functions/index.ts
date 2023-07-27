@@ -1,6 +1,7 @@
 export * from './array.util';
 export * from './data.util';
 export * from './dialog.util';
+export * from './document.util';
 export * from './drive.util';
 export * from './email.util';
 export * from './folder.util';
