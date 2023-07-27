@@ -5,6 +5,7 @@ export const enum MeetingVariable {
   Date = '{{meetingDate}}',
   ReverseDate = '{{meetingDateSort}}',
   MeetingAttendees = '{{meetingAttendees}}',
+  MeetingType = '{{meetingType}}',
 }
 
 export const enum ProjectVariable {
