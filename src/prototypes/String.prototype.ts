@@ -49,16 +49,10 @@ String.prototype.asPhoneNumber = function (): string {
 };
 
 String.prototype.isUrl = function (): boolean {
-  let url: URL;
   const str: string = this;
+  const regex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
 
-  try {
-    url = new URL(str);
-  } catch {
-    return false;
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:';
+  return regex.test(str);
 };
 
 export default {};
