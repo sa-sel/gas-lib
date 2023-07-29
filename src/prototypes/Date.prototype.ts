@@ -6,6 +6,8 @@ declare global {
     asDateString(): string;
     /** "YYYY/MM/DD" */
     asReverseDateString(): string;
+    /** "MM/DD" */
+    asReverseDateStringWithoutYear(): string;
     /** "DD/MM/YYYY hh:mm:ss" */
     asTimestamp(): string;
     /** "hh:mm:ss" */
@@ -23,6 +25,12 @@ Date.prototype.asReverseDateString = function (): string {
   const date: Date = this;
 
   return `${date.getFullYear()}/${(date.getMonth() + 1).withLeadingZeros(2)}/${date.getDate().withLeadingZeros(2)}`;
+};
+
+Date.prototype.asReverseDateStringWithoutYear = function (): string {
+  const date: Date = this;
+
+  return `${(date.getMonth() + 1).withLeadingZeros(2)}/${date.getDate().withLeadingZeros(2)}`;
 };
 
 Date.prototype.asTime = function (): string {

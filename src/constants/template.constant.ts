@@ -4,8 +4,10 @@ export const enum MeetingVariable {
   End = '{{meetingEnd}}',
   Date = '{{meetingDate}}',
   ReverseDate = '{{meetingDateSort}}',
+  ReverseDateWithoutYear = '{{meetingDateSortNoYear}}',
   MeetingAttendees = '{{meetingAttendees}}',
   MeetingType = '{{meetingType}}',
+  MeetingTypeShort = '{{meetingTypeShort}}',
 }
 
 export const enum ProjectVariable {
