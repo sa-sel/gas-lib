@@ -1,4 +1,4 @@
-import { ProjectVariable, SaDepartment } from '@lib/constants';
+import { ProjectVariable, SaDepartment, administrativeDepartments } from '@lib/constants';
 import { Folder } from '@lib/models';
 import { Student } from './student.class';
 
@@ -17,7 +17,7 @@ export abstract class BaseProject {
   constructor(public readonly name: string, public readonly department: SaDepartment, public readonly start = new Date()) {
     this.edition = BaseProject.defaultEdition;
     this.members = [];
-    this.fullDepartmentName = this.department === SaDepartment.Administrative ? this.department : `Diretoria de ${this.department}`;
+    this.fullDepartmentName = administrativeDepartments.has(this.department) ? this.department : `Diretoria de ${this.department}`;
   }
 
   get templateVariables(): Record<ProjectVariable, string> {

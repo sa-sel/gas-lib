@@ -13,6 +13,13 @@ export const enum SaDepartment {
   Treasury = 'Finanças',
 }
 
+export const administrativeDepartments = new Set([
+  SaDepartment.Administrative,
+  SaDepartment.Presidency,
+  SaDepartment.VicePresidency,
+  SaDepartment.Secretary,
+]);
+
 export const SaDepartmentAbbreviations: Partial<Record<SaDepartment, string>> = {
   [SaDepartment.Academic]: 'AA',
   [SaDepartment.HR]: 'RH',
