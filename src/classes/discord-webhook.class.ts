@@ -3,7 +3,7 @@ import { DiscordWebhookPostParams } from '@lib/models';
 
 export class DiscordWebhook {
   constructor(public readonly url: string) {
-    if (!url.isUrl()) {
+    if (!(this.url = url.trim()).isUrl()) {
       Logger.log(`[${DialogTitle.Error}] Webhook URL is not URL: ${url}`);
     }
   }
