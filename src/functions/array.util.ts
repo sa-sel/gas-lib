@@ -19,3 +19,11 @@ export const split = <T>(arr: T[], sep: T | ((o: T) => boolean)): T[][] =>
  * @example transpose([[1, 2, 3, 4], [5, 6, 7, 8]]) -> [[1, 5], [2, 6], [3, 7], [4, 8]]
  */
 export const transpose = (mat: any[][]) => mat.reduce((acc, cur) => cur.map((_, i) => (acc[i] || []).concat(cur[i])), []);
+
+/**
+ * @param elements target elements you want to check
+ * @param list list you want to check if the elments are into
+ * @return `return[i]` = if `list` contains `elements[i]`
+ */
+export const areElementsInList = <T>(elements: T[], list: T[], compare = (a: T, b: T) => a === b): boolean[] =>
+  list.reduce((acc, cur) => elements.map((target, i) => acc[i] || compare(target, cur)), Array(elements.length).fill(false));
