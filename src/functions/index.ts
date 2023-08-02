@@ -1,4 +1,5 @@
 export * from './array.util';
+export * from './assert.util';
 export * from './data.util';
 export * from './dialog.util';
 export * from './document.util';

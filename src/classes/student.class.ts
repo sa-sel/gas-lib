@@ -21,7 +21,7 @@ export class Student implements StudentDataModel {
   }
 
   static fromNameNicknameString(nameNickname: string, args: Omit<StudentDataModel, 'name' | 'nickname'>): Student {
-    const [name, nickname] = nameNickname.split(/(.+?)\((.+?)\)/).filter(e => e);
+    const [name, nickname] = nameNickname.split(/^(.+?)\((.+?)\)?$/).filter(e => e);
 
     return new this({
       name,
